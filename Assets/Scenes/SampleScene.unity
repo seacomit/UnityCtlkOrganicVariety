@@ -986,6 +986,9 @@ MonoBehaviour:
   leafColorB: {r: 0.38020372, g: 0.17755428, b: 0.6603774, a: 0.9019608}
   maxSagAngleA: 15
   maxSagAngleB: 25
+  spinSpeedA: 20
+  spinSpeedB: 25
+  reverseSpinChance: 0.25
 --- !u!1 &2090920585
 GameObject:
   m_ObjectHideFlags: 0
