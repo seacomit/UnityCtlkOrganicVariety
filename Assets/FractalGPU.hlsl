@@ -12,13 +12,16 @@ void ConfigureProcedural () {
 	#endif
 }
 
-float2 _SequenceNumbers;
+float4 _SequenceNumbers;
 
 float4 _ColorA, _ColorB;
 
 float4 GetFractalColor() {
     #if defined(UNITY_PROCEDURAL_INSTANCING_ENABLED)
-		return lerp(_ColorA, _ColorB, frac(unity_InstanceID * _SequenceNumbers.x + _SequenceNumbers.y));
+			float4 color;
+		color.rgb = lerp(_ColorA.rgb, _ColorB.rgb, frac(unity_InstanceID * _SequenceNumbers.x + _SequenceNumbers.y));
+		color.a = lerp(_ColorA.a, _ColorB.a, frac(unity_InstanceID * _SequenceNumbers.z + _SequenceNumbers.w));
+		return color;
 	#else
 		return _ColorA;
 	#endif
