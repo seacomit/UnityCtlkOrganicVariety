@@ -32,11 +32,26 @@ public class Fractal : MonoBehaviour
             FractalPart parent = parents[i / 5];
             FractalPart part = parts[i];
             part.spinAngle += spinAngleDelta;
-            part.worldRotation = mul(parent.worldRotation,
+            float3 upAxis = mul(mul(parent.worldRotation, part.rotation), up());
+            float3 sagAxis = cross(up(), upAxis);
+            float sagMagnitude = length(sagAxis);
+            quaternion baseRotation;
+            if (sagMagnitude > 0f)
+            {
+                sagAxis /= sagMagnitude;
+                quaternion sagRotation = quaternion.AxisAngle(sagAxis, PI * 0.25f * sagMagnitude);
+                baseRotation = mul(sagRotation, parent.worldRotation);
+            }
+            else
+            {
+                baseRotation = parent.worldRotation;
+            }
+
+            part.worldRotation = mul(baseRotation,
                 mul(part.rotation, quaternion.RotateY(part.spinAngle)));
             part.worldPosition =
                 parent.worldPosition +
-                mul(parent.worldRotation, (1.5f * scale * part.direction));
+                mul(part.worldRotation, float3(0f, 1.5f * scale, 0f));
             parts[i] = part;
             float3x3 r = float3x3(part.worldRotation) * scale;
             matrices[i] = float3x4(r.c0, r.c1, r.c2, part.worldPosition);
@@ -45,7 +60,7 @@ public class Fractal : MonoBehaviour
 
     struct FractalPart
     {
-        public float3 direction, worldPosition;
+        public float3 worldPosition;
         public quaternion rotation, worldRotation;
         public float spinAngle;
     }
@@ -71,18 +86,13 @@ public class Fractal : MonoBehaviour
 
     ComputeBuffer[] matricesBuffers;
 
-    static float3[] directions = {
-        up(), right(), left(), forward(), back()
-    };
-
     static quaternion[] rotations = {
         quaternion.identity,
         quaternion.RotateZ(-0.5f * PI), quaternion.RotateZ(0.5f * PI),
         quaternion.RotateX(0.5f * PI), quaternion.RotateX(-0.5f * PI)
     };
 
-    FractalPart CreatePart(int childIndex) => new FractalPart { 
-            direction = directions[childIndex],
+    FractalPart CreatePart(int childIndex) => new FractalPart {
             rotation = rotations[childIndex]
     };
 
