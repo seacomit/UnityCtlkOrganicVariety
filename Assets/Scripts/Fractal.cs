@@ -84,7 +84,10 @@ public class Fractal : MonoBehaviour
     float maxSagAngleA = 15, maxSagAngleB = 25f;
 
     [SerializeField, Range(0f, 90f)]
-    float spinVelocityA = 20f, spinVelocityB = 25f;
+    float spinSpeedA = 20f, spinSpeedB= 25f;
+
+    [SerializeField, Range(0f, 1f)]
+    float reverseSpinChance = 0.25f;
 
     NativeArray<FractalPart>[] parts;
 
@@ -101,7 +104,9 @@ public class Fractal : MonoBehaviour
     FractalPart CreatePart(int childIndex) => new FractalPart {
         maxSagAngle = radians(Random.Range(maxSagAngleA, maxSagAngleB)),
         rotation = rotations[childIndex],
-        spinVelocity = radians(Random.Range(spinVelocityA, spinVelocityB))
+        spinVelocity = 
+            (Random.value < reverseSpinChance ? -1f : 1f) * 
+            radians(Random.Range(spinSpeedA, spinSpeedB))
     };
 
     static readonly int
